@@ -13,11 +13,11 @@ paymentRouter.get("/createpayment", PaymentController.createPayment);
 paymentRouter.get("/paymentdetails", PaymentController.getPayment);
 paymentRouter.post(
   "/paystack/createpayment",
-  PaymentController.startPaystackPayment,
+  PaymentController.startPaystackPayment
 );
 paymentRouter.get(
   "/paystack/verifypayment",
-  PaymentController.verifyPaystackPayment,
+  PaymentController.verifyPaystackPayment
 );
-s;
+
 export default paymentRouter;

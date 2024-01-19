@@ -30,8 +30,8 @@ export const auth = asyncHandler(
           if (isJwtPayload(decoded)) {
             console.log(decoded.id);
           }
-          // console.log("Decoded Data: ", decoded);
-          const user = await authModel.findById(decoded.id);
+          const user = await authModel.findById(decoded.userId);
+          // TODO: what happens if user is undefined
           if (!lodash.isUndefined(user)) {
             req.user = { id: user?.id };
             next();
