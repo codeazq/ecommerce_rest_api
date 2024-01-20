@@ -2,8 +2,12 @@ import { Document, Types } from "mongoose";
 import { ProductDataInterface } from "../interfaces/product_Interface";
 
 export interface OrderInterface extends Document {
-  products: { product: ProductDataInterface; count: number; color: string }[];
-  // products: Types.DocumentArray<OrderProductInterface>;
+  products: {
+    product: ProductDataInterface;
+    count: number;
+    color: string;
+    price: number;
+  }[];
   paymentIntent: any;
   paymentType: "Web" | "Cash on Delivery";
   PaymentStatus: "Pending" | "Failed" | "Successful";
@@ -21,11 +25,6 @@ export interface OrderInterface extends Document {
   updatedAt: Date;
 }
 
-export interface OrderProductInterface extends Document {
-  product: Types.ObjectId;
-  count: number;
-  color: string;
-}
 export interface UpdateOrderStatusParams {
   id: string;
   status: string;

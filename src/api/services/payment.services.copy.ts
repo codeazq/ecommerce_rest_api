@@ -1,4 +1,3 @@
-import { checkoutModel } from "../models/checkout_model";
 import { UserOrderModel } from "../models/orderModel";
 import axios from "axios";
 
@@ -28,34 +27,26 @@ export class PaymentService {
       if (!order)
         throw new Error(`order for payment reference "${reference}" not found`);
 
-      /**
-       * Get the total cost of the products in the order
-       * if total cost of products in order is not equal to amount paid throw error
-       *
-       */
+      const totalCost: number = order.products.reduce(
+        (total, current) => total + current.price * current.count,
+        0
+      );
 
-      /**
-       * Since we have conformed that
-       * 1) the reference exist (from paystack),
-       * 2) the order id attached to the payment through the metadata exist
-       * 3) the total amount paid === total cost of the products (total cost of order or cost of each product should be stored in the database)
-       *
-       * You should
-       * 1) Update the paymentType, PaymentStatus, paymentReference, paymentProcessor of the order
-       */
+      if (response.data.data.amount !== totalCost) {
+        //  TODO: handle amount paid !== to cost of order
+        // store this information somwehere and contact the ueser
+      } else {
+        UserOrderModel.findByIdAndUpdate(order._id, {
+          paymentType: "Web",
+          PaymentStatus: "Successful",
+          paymentReference: response.data.data.reference,
+          paymentProcessor: "Paystack",
+          orderStatus: "Processing",
+        });
+      }
 
       return response.data;
     } catch (error) {
-      console.error;
-    }
-  }
-
-  async paymentReceipt(reference: string) {
-    try {
-      const transaction = await checkoutModel.findOne({ reference: reference });
-      return transaction;
-    } catch (error: any) {
-      error.source = "Payment Receipt";
       console.error;
     }
   }

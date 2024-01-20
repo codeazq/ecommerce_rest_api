@@ -1,5 +1,6 @@
 import { validateMongoDbID } from "../helpers/validateDbId";
 import { UserOrderModel } from "../models/orderModel";
+import { productModel } from "../models/productsModels";
 import {
   CreateOrderParams,
   OrderInterface,
@@ -8,21 +9,29 @@ import {
 export class OrderService {
   public static async create(data: CreateOrderParams): Promise<any> {
     try {
-      const order = await UserOrderModel.create(data);
-
-      const populatedOrder = await UserOrderModel.findById(order._id).populate(
-        "products.product"
+      const productIds: string[] = data.products.map(
+        (product) => product.product
       );
 
-      if (!populatedOrder) throw new Error("error processing order");
+      const products = await productModel.find({ _id: { $in: productIds } });
 
-      const totalCost: number = populatedOrder.products.reduce(
-        (total, current) => total + current.product.price * current.count,
+      // TODO: Handle if a product in the createorderparams is not found
+      // throw error or just return the one that were found
+      const hydratedProducts = data.products.map((product) => {
+        const detailedProduct = products.find((i) => i._id == product.product);
+        return { ...product, price: detailedProduct?.price };
+      });
+
+      const order = await UserOrderModel.create({
+        ...data,
+        products: hydratedProducts,
+      });
+
+      const totalCost: number = order.products.reduce(
+        (total, current) => total + current.price * current.count,
         0
       );
-
-      // return { ...populatedOrder, totalCost: totalCost };
-      return { order: populatedOrder, totalCost };
+      return { order, totalCost };
     } catch (error) {
       throw new Error("Error creating order");
     }

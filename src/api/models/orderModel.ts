@@ -1,33 +1,19 @@
 import mongoose, { Schema } from "mongoose";
-import {
-  OrderInterface,
-  OrderProductInterface,
-} from "../interfaces/order_interface";
-
-const OrderProductSchema = new Schema<OrderProductInterface>({
-  product: {
-    type: Schema.Types.ObjectId,
-    ref: "ProductModel",
-  },
-  // if count is quantity, you should rename this to quantity
-  count: Number,
-  color: String,
-});
+import { OrderInterface } from "../interfaces/order_interface";
 
 const orderSchema = new Schema<OrderInterface>(
   {
-    // products: { type: [OrderProductSchema], required: true },
     products: [
       {
         product: {
           type: Schema.Types.ObjectId,
           ref: "ProductModel",
         },
+        // TODO:
         // if count is quantity, you should rename this to quantity
         count: Number,
         color: String,
-        // it would be a goos idea to sore the current price, of the products
-        // and / or the total cost of the order
+        price: Number,
       },
     ],
     paymentIntent: {},
